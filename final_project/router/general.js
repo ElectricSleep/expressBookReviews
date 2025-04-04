@@ -6,8 +6,14 @@ const public_users = express.Router();
 
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  //Task 6
+  // Push a new user object into the users array based on query parameters from the request
+  users.push({
+    "userName": req.query.userName,
+    "passWord": req.query.passWord,
+  });
+  // Send a success message as the response, indicuating the user has been added
+  res.send("The user " + req.query.userName + " has been added!")
 });
 
 // Get the book list available in the shop
@@ -71,8 +77,18 @@ public_users.get('/title/:title',function (req, res) {
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    // Task 5
+    // Extract the ISBN paramber from the request URL
+    const isbn = req.params.isbn;
+
+    // Find the book with the matching ISBN
+    const book = Object.values(books).find(book => book.isbn === isbn);
+
+    if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+    }
+
+    res.json(book.reviews);
 });
 
 module.exports.general = public_users;
