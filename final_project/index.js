@@ -1,14 +1,20 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const session = require('express-session')
+
 const customer_routes = require('./router/auth_users.js').authenticated;
 const genl_routes = require('./router/general.js').general;
 
 const app = express();
+const PORT =5000;
 
 app.use(express.json());
 
-app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
+app.use(session({
+    secret: "fingerprint_custoemr",
+    resave: true,
+    saveUninitialized: true
+}));
 
 app.use("/customer/auth/*", function auth(req,res,next){
     // Updating the authentication mechanism
@@ -25,9 +31,8 @@ app.use("/customer/auth/*", function auth(req,res,next){
         next();
     });
 });
- 
-const PORT =5000;
 
+// Register routes
 app.use("/customer", customer_routes);
 app.use("/", genl_routes);
 
