@@ -7,7 +7,7 @@ let users = [];
 
 const isValid = (username)=>{
     // Check if username exists in users
-    return users.com(user => user.username === username);
+    return users.some(user => user.username === username);
 }
 
 const authenticatedUser = (username,password)=>{
@@ -21,7 +21,7 @@ regd_users.post("/login", (req,res) => {
     const password = req.body.password || req.query.password;
 
     // Check if both username and password are provided
-    if (!username | !password) {
+    if (!username || !password) {
         return res.status(400).json({ message: "Username and Password are required." });
     }
 
@@ -46,8 +46,42 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const isbn = req.params.isbn;
+    const review = req.query.review;
+
+    // Check if review text is provided
+    if (!review) {
+        return res.status(400).json({ message: "Review text is required." });
+    }
+
+    // Get the username from the session
+    const username = req.session.authorization?.username;
+
+    if (!username) {
+        return res.status(401).json({ message: "Unauthorized: User not logged in." });
+    }
+
+    // Search through books to find matching ISBN
+    const bookKey = Object.keys(books).find(key => books[key].isbn === isbn);
+
+    if (!bookKey) {
+        return res.status(404).json({ message: "Book not found for given ISBN." });
+    }
+
+    const book = books[bookKey];
+
+    // Initialize reviews if missing
+    if (!book.reviews) {
+        book.reviews = {};
+    }
+
+    // Add or update review
+    book.reviews[username] = review;
+
+    return res.status(200).json({
+        message: `Review by '${username}' for book '${book.title}' has been added/updated.`,
+        reviews: book.reviews
+    });
 });
 
 module.exports.authenticated = regd_users;
