@@ -32,8 +32,11 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   // Task 1
-  // res.send(JSON.stringify(books,null,4));
+  res.send(JSON.stringify(books,null,4));
+});
 
+// Get the book list available by async
+public_users.get("/async-books", async (req, res) => {
   // Task 10
   axios.get('http://localhost:5000/').then(response => {
     res.status(200).json(response.data);
@@ -56,7 +59,15 @@ public_users.get('/isbn/:isbn',function (req, res) {
 
     res.json(book);
 });
-  
+
+// Get book details based on ISBN by Promise
+public_users.get("/promise-isbn/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    axios.get(`http://localhost:5000/isbn/${isbn}`)
+    .then(response => res.status(200).json(response.data))
+    .catch(error => res.status(500).json({ message: "Error fetching book by ISNB", error: error.message }));
+});
+
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   // Task 3
