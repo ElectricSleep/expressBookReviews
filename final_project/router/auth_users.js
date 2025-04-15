@@ -84,6 +84,45 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     });
 });
 
+// Delete a book review [Task 9]
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+
+    // Get the logged-in username from token
+    const username = req.user?.username;
+
+    if (!username) {
+        return res.status(401).json({ message: "Unauthorized: User not logged in." });
+    }
+
+    // Find the book by matching ISBN
+    const bookKey = Object.keys(books).find(
+        key => books[key].isbn === isbn
+    );
+
+    if (!bookKey) {
+        return res.status(404).json({ message: "Book not found with provided ISBN." });
+    }
+
+    const book = books[bookKey];
+
+    // If the book has no reviews or no review from this user
+    if (!book.reviews || !book.reviews[username]) {
+        return res.status(404).json({
+            message: `No review found for '${username}' on this book.`
+        });
+    }
+
+    // Delete only the current user's review
+    delete book.reviews[username];
+
+    return res.status(200).json({
+        message: `Review by '${username}' has been successfully deleted.`,
+        reviews: book.reviews
+    });
+});
+
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
