@@ -35,7 +35,7 @@ public_users.get('/',function (req, res) {
   res.send(JSON.stringify(books,null,4));
 });
 
-// Get the book list available by async
+// Get the book list available by async/await
 public_users.get("/async-books", async (req, res) => {
   // Task 10
   axios.get('http://localhost:5000/').then(response => {
@@ -85,6 +85,17 @@ public_users.get('/author/:author',function (req, res) {
   }
 
   res.json(booksByAuthor);
+});
+
+// Get book details by author using async/await
+public_users.get("/async-author/:author", async (req, res) => {
+    const author = req.params.author;
+    try {
+        const response = await axios.get(`http://localhost:5001/author/${author}`);
+        res.status(200).json(response.data);
+    } catch (error) {
+        res.status(500).json({ message: `Error fetching books by author "${author}"`, error: error.message});
+    };
 });
 
 // Get all books based on title
